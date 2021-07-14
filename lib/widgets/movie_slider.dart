@@ -35,7 +35,6 @@ class _MovieSliderState extends State<MovieSlider> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
   }
 
@@ -74,7 +73,7 @@ class _MovieSliderState extends State<MovieSlider> {
               itemBuilder: ( _ , int index) {
                 Movie movie = widget.movies[index];
                 
-                return _MoviePoster(movie: movie);
+                return _MoviePoster(movie: movie, heroId: '${widget.title}-$index-${widget.movies[0].id}');
               } 
             ),
           )
@@ -88,11 +87,15 @@ class _MoviePoster extends StatelessWidget {
 
 
   final Movie movie;
+  final String heroId;
 
-  const _MoviePoster({Key key, @required this.movie}) : super(key: key);
+  const _MoviePoster({Key key, @required this.movie, @required this.heroId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    
+    movie.heroId = this.heroId;
+
     return Container (
       width: 130,
       height: 190,
@@ -100,17 +103,21 @@ class _MoviePoster extends StatelessWidget {
       margin: EdgeInsets.symmetric( horizontal:  10),
       child: Column(
         children: [
-
+          
+          
           GestureDetector(
-            onTap: () => Navigator.pushNamed(context, 'details', arguments: 'movie-details'),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: FadeInImage(
-                placeholder: AssetImage('assets/no-image.jpg'), 
-                image: NetworkImage(movie.fullPosterImg),
-                width: 130,
-                height: 190,
-                fit: BoxFit.cover,
+            onTap: () => Navigator.pushNamed(context, 'details', arguments: movie),
+            child: Hero(
+              tag: movie.heroId,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: FadeInImage(
+                  placeholder: AssetImage('assets/no-image.jpg'), 
+                  image: NetworkImage(movie.fullPosterImg),
+                  width: 130,
+                  height: 190,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),

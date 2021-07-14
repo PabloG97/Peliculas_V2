@@ -25,8 +25,11 @@ class MoviesProvider extends ChangeNotifier{
     this.getUpcomingMovies();
   }
 
+  Map<int, List<Cast>> moviesCast = {};
+
+
   Future<String> _getJsonDAta(String endpoint, [int page = 1]) async  {
-    var url = Uri.https(this._baseUrl, '3/movie/$endpoint', {
+    final url = Uri.https(this._baseUrl, '3/movie/$endpoint', {
       'api_key': _apiKey,
       'language': _language,
       'page': '$page'
@@ -63,4 +66,32 @@ class MoviesProvider extends ChangeNotifier{
    // print(upcomingMovies[2].title);
     notifyListeners();
   }
+
+  Future<List<Cast>> getMovieCast(int movieId) async{
+
+    if(moviesCast.containsKey(movieId)) return moviesCast[movieId];
+    //print('GetMovieCast init');
+
+    final jsonData = await this._getJsonDAta('${movieId}/credits');
+    final creditsResponse = CreditsReponse.fromJson(jsonData);
+    moviesCast[movieId] = creditsResponse.cast;
+
+    return creditsResponse.cast;
+
+  }
+
+  Future<List<Movie>> searchMovies(String query) async {
+    final url = Uri.https(this._baseUrl, '3/search/movie', {
+      'api_key': _apiKey,
+      'language': _language,
+      'query' : query,
+      'include_adult' : 'true'
+    });
+
+    final response = await http.get(url);
+    final searchResponse = SearchResponse.fromJson(response.body);
+
+    return searchResponse.results;
+  }
+
 }
